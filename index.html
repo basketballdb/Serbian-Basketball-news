@@ -144,6 +144,8 @@
         }
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .btn-danger { background: var(--danger); color: white; width: auto; padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 6px; }
+        .btn-danger:hover { background: var(--danger-hover); }
 
         /* --- 6. NEWS FEED & CARDS --- */
         .feed-header {
@@ -165,11 +167,10 @@
             animation: fadeUp 0.5s ease forwards;
             opacity: 0;
             transform: translateY(20px);
-            cursor: pointer;
         }
         .news-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
         
-        .card-image-wrapper { position: relative; width: 100%; height: 200px; overflow: hidden; }
+        .card-image-wrapper { position: relative; width: 100%; height: 200px; overflow: hidden; cursor: pointer; }
         .card-image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
         .news-card:hover .card-image { transform: scale(1.05); }
         
@@ -180,11 +181,11 @@
             backdrop-filter: blur(4px);
         }
 
-        .card-content { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-content { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; cursor: pointer; }
         .card-title { font-size: 1.25rem; margin-bottom: 0.5rem; color: var(--text-main); line-height: 1.3; }
         .card-excerpt { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         
-        .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 1rem; }
+        .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding: 1rem 1.5rem; }
         .tag-container { display: flex; flex-wrap: wrap; gap: 5px; }
         .tag { background: var(--bg-body); color: var(--text-main); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--border-color); }
         .tag.primary-tag { background: var(--primary); color: white; border-color: var(--primary); }
@@ -231,6 +232,7 @@
             animation: slideInRight 0.3s ease forwards, fadeOut 0.3s ease 2.7s forwards;
         }
         .toast.success { border-color: #10B981; }
+        .toast.error { border-color: var(--danger); }
 
         /* --- 9. KEYFRAME ANIMATIONS --- */
         @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
@@ -257,10 +259,7 @@
     <div class="app-container">
         
         <aside class="glass-panel">
-            <h2>✍️ Post Article (Preview Mode)</h2>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-                Since you are hosted on GitHub Pages, anything you type here will only show up as a temporary preview until you refresh. To make news permanent, add it to the JavaScript code!
-            </p>
+            <h2>✍️ Post Article</h2>
             <form id="newsForm" onsubmit="handleFormSubmit(event)">
                 <div class="form-group">
                     <label for="newsTitle">Headline</label>
@@ -282,7 +281,7 @@
                     <label for="newsDate">Publish Date</label>
                     <input type="date" id="newsDate" class="form-control" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Preview Article</button>
+                <button type="submit" class="btn btn-primary">Publish to Feed</button>
             </form>
         </aside>
 
@@ -304,27 +303,31 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
-        // --- 1. STATE MANAGEMENT (HARDCODED FOR GITHUB PAGES) ---
-        // ADD YOUR REAL ARTICLES HERE TO MAKE THEM PERMANENT!
-        let articles = [
-            {
-                id: 'news_1',
-                title: 'The Evolution of the Point Guard: How the Position Changed Forever',
-                image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-                description: 'In the modern era of basketball, the point guard is no longer just a floor general tasked with distributing the ball. Today\'s lead guards are lethal scoring threats, capable of pulling up from 30 feet or attacking the rim with ferocity.\n\nPlayers like Stephen Curry and Damian Lillard have stretched defenses to their breaking point, creating space not just for themselves, but for their teammates. This article explores the systemic changes in coaching philosophies and rule modifications that allowed this evolution to occur.',
-                tags: ['Analysis', 'Point Guards', 'NBA'],
-                date: '2024-03-15'
-            },
-            {
-                id: 'news_2',
-                title: 'Rookie Watch: Who is Leading the Race for ROTY?',
-                image: 'https://images.unsplash.com/photo-1519861531473-9200262188bf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-                description: 'As we hit the midpoint of the season, the Rookie of the Year race is heating up. We break down the top three candidates, analyzing their advanced stats, defensive impact, and overall value to their respective franchises. \n\nIt is going to be a tight race down the stretch!',
-                tags: ['Rookies', 'Awards', 'Draft'],
-                date: '2024-03-12'
-            }
-            // To add a new permanent article, put a comma here, and paste a new block!
-        ];
+        // --- 1. STATE MANAGEMENT (LOCAL STORAGE WITH DEFAULTS) ---
+        let articles = JSON.parse(localStorage.getItem('basketballNews'));
+
+        // If local storage is completely empty, populate it with starter posts
+        if (!articles) {
+            articles = [
+                {
+                    id: 'news_1',
+                    title: 'The Evolution of the Point Guard: How the Position Changed Forever',
+                    image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+                    description: 'In the modern era of basketball, the point guard is no longer just a floor general tasked with distributing the ball. Today\'s lead guards are lethal scoring threats, capable of pulling up from 30 feet or attacking the rim with ferocity.\n\nPlayers like Stephen Curry and Damian Lillard have stretched defenses to their breaking point, creating space not just for themselves, but for their teammates. This article explores the systemic changes in coaching philosophies and rule modifications that allowed this evolution to occur.',
+                    tags: ['Analysis', 'Point Guards', 'NBA'],
+                    date: '2026-03-15'
+                },
+                {
+                    id: 'news_2',
+                    title: 'Rookie Watch: Who is Leading the Race for ROTY?',
+                    image: 'https://images.unsplash.com/photo-1519861531473-9200262188bf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+                    description: 'As we hit the midpoint of the season, the Rookie of the Year race is heating up. We break down the top three candidates, analyzing their advanced stats, defensive impact, and overall value to their respective franchises. \n\nIt is going to be a tight race down the stretch!',
+                    tags: ['Rookies', 'Awards', 'Draft'],
+                    date: '2026-03-12'
+                }
+            ];
+            localStorage.setItem('basketballNews', JSON.stringify(articles));
+        }
 
         // Set default date in form to today
         document.getElementById('newsDate').valueAsDate = new Date();
@@ -354,10 +357,10 @@
             const icon = type === 'success' ? '✅' : '⚠️';
             toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
             container.appendChild(toast);
-            setTimeout(() => { if(toast.parentElement) toast.remove(); }, 4000);
+            setTimeout(() => { if(toast.parentElement) toast.remove(); }, 3000);
         }
 
-        // --- 4. CORE LOGIC (RENDER) ---
+        // --- 4. CORE LOGIC (RENDER, ADD, DELETE) ---
         function displayNews(newsToDisplay) {
             const feed = document.getElementById('newsFeed');
             const count = document.getElementById('articleCount');
@@ -369,7 +372,7 @@
                 feed.innerHTML = `
                     <div class="empty-state">
                         <h2>📭 No News Found</h2>
-                        <h3>Try adjusting your search criteria!</h3>
+                        <h3>Try adjusting your search criteria or post a new article!</h3>
                     </div>`;
                 return;
             }
@@ -379,7 +382,6 @@
 
             newsToDisplay.forEach((article, index) => {
                 const dateObj = new Date(article.date);
-                // Adjusting to ensure exact date displays without timezone offset bugs
                 const formattedDate = new Date(dateObj.getTime() + Math.abs(dateObj.getTimezoneOffset()*60000)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
                 let tagsHTML = '';
@@ -405,13 +407,13 @@
                     </div>
                     <div class="card-footer">
                         <div class="tag-container">${tagsHTML}</div>
+                        <button class="btn btn-danger" onclick="deleteNews(event, '${article.id}')">🗑️ Delete</button>
                     </div>
                 `;
                 feed.appendChild(card);
             });
         }
 
-        // Preview Mode form submission
         function handleFormSubmit(event) {
             event.preventDefault(); 
             
@@ -433,12 +435,28 @@
             };
 
             articles.push(newArticle);
+            saveData();
             
             document.getElementById('newsForm').reset();
             document.getElementById('newsDate').valueAsDate = new Date();
             
             filterNews(); 
-            showToast('Preview Mode: Added temporarily! Hardcode it to keep it forever.', 'success');
+            showToast('Article published successfully!', 'success');
+        }
+
+        function deleteNews(event, id) {
+            event.stopPropagation(); // Prevent opening modal when clicking delete
+            
+            if(confirm("Are you sure you want to permanently delete this article?")) {
+                articles = articles.filter(article => article.id !== id);
+                saveData();
+                filterNews();
+                showToast('Article removed', 'error');
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('basketballNews', JSON.stringify(articles));
         }
 
         // --- 5. SEARCH & FILTER ---
