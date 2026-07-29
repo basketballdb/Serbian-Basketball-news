@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏀 Basketball News Hub - Manage & Publish News</title>
+    <style>
+        /* ============================================================
+             CSS CUSTOM PROPERTIES & THEME
+             ============================================================ */
+        :root {
+            --primary: #e8751a;
+            --primary-dark: #c45d0f;
+            --primary-light: #ff9a4d;
+            --secondary: #1a1a2e;
+            --secondary-light: #252540;
+            --accent: #f7a440;
+            --bg: #f5f0eb;
+            --bg-card: #ffffff;
+            --text: #1a1a2e;
+            --text-light: #5a5a70;
+            --text-muted: #8888a0;
+            --border: #e0d8d0;
+            --border-light: #f0ebe4;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.06);
+            --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.18), 0 8px 20px rgba(0, 0, 0, 0.08);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --font-heading: 'Georgia', 'Times New Roman', serif;
+            --font-body: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.25s ease;
+            --transition-slow: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            --max-width: 1280px;
+            --header-height: 68px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image:
+                radial-gradient(ellipse at 15% 10%, rgba(232, 117, 26, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 85% 90%, rgba(247, 164, 64, 0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 50%, rgba(26, 26, 46, 0.02) 0%, transparent 70%);
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--secondary);
+        }
+
+        h1 { font-size: 2.2rem; line-height: 1.15; }
+        h2 { font-size: 1.7rem; line-height: 1.2; }
+        h3 { font-size: 1.3rem; line-height: 1.3; }
+        h4 { font-size: 1.1rem; }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+        a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .header {
+            background: var(--secondary);
+            color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            height: var(--header-height);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.25);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .header-inner {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            white-space: nowrap;
+            user-select: none;
+        }
+        .header-logo .logo-icon {
+            font-size: 2rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            25% { transform: translateY(-8px); }
+            50% { transform: translateY(0); }
+            75% { transform: translateY(-4px); }
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-family: var(--font-body);
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+            user-select: none;
+            text-decoration: none;
+            line-height: 1.3;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(232, 117, 26, 0.35);
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 16px rgba(232, 117, 26, 0.5);
+            transform: translateY(-1px);
+        }
+        .btn-outline {
+            background: transparent;
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
+        }
+        .btn-sm { padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; }
+        .btn-danger {
+            background: #d94436;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(217, 68, 54, 0.3);
+        }
+        .btn-danger:hover {
+            background: #b83227;
+            box-shadow: 0 4px 14px rgba(217, 68, 54, 0.45);
+        }
+        .btn-ghost {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid transparent;
+        }
+        .btn-ghost:hover {
+            background: var(--border-light);
+            border-color: var(--border);
+        }
+        .btn-icon {
+            width: 38px; height: 38px;
+            padding: 0;
+            border-radius: 50%;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .main {
+            flex: 1;
+            max-width: var(--max-width);
+            width: 100%;
+            margin: 0 auto;
+            padding: 28px 24px 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .stats-bar { display: flex; gap: 16px; flex-wrap: wrap; }
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 18px 22px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 150px;
+            border: 1px solid var(--border-light);
+            transition: all var(--transition-normal);
+        }
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .stat-icon {
+            font-size: 2.2rem;
+            width: 50px; height: 50px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .stat-icon.orange { background: #fff3e8; }
+        .stat-icon.blue { background: #e8f2ff; }
+        .stat-icon.green { background: #e8fff2; }
+        .stat-info .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            color: var(--secondary);
+            line-height: 1;
+        }
+        .stat-info .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-top: 2px;
+        }
+
+        .filter-panel {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 22px 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: flex-end;
+            transition: all var(--transition-normal);
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 180px;
+        }
+        .filter-group label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+        .filter-group input, .filter-group select {
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-family: var(--font-body);
+            background: #fafaf8;
+            transition: all var(--transition-fast);
+            color: var(--text);
+            width: 100%;
+        }
+        .filter-group input:focus, .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(232, 117, 26, 0.1);
+            background: #fff;
+        }
+        .filter-group input::placeholder { color: #bbb; }
+        .filter-actions { display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0; }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 22px;
+        }
+        .news-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            transition: all var(--transition-slow);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            position: relative;
+        }
+        .news-card:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-6px);
+            border-color: var(--primary-light);
+        }
+        .news-card-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #e8e4df 0%, #d5cfc8 100%);
+            display: block;
+            border-bottom: 2px solid var(--border-light);
+            transition: transform var(--transition-slow);
+        }
+        .news-card:hover .news-card-image { transform: scale(1.04); }
+        .news-card-image-placeholder {
+            width: 100%;
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            background: linear-gradient(135deg, #fef3e8 0%, #fde4cc 100%);
+            border-bottom: 2px solid var(--border-light);
+            color: var(--primary);
+        }
+        .news-card-body {
+            padding: 18px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .news-card-date { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; letter-spacing: 0.02em; }
+        .news-card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            color: var(--secondary);
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .news-card-desc {
+            font-size: 0.88rem;
+            color: var(--text-light);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex: 1;
+        }
+        .news-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            border-radius: 20px;
+            background: #fef3e8;
+            color: var(--primary-dark);
+            letter-spacing: 0.02em;
+            border: 1px solid #fde0c0;
+            transition: all var(--transition-fast);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .tag:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+        .news-card-actions {
+            display: flex;
+            gap: 6px;
+            padding: 0 20px 16px;
+            flex-wrap: wrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            grid-column: 1 / -1;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 2px dashed var(--border);
+        }
+        .empty-state .empty-icon { font-size: 5rem; margin-bottom: 16px; }
+        .empty-state h3 { margin-bottom: 8px; color: var(--text-light); }
+        .empty-state p { color: var(--text-muted); max-width: 400px; margin: 0 auto 20px; }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.2s ease;
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.3s ease;
+            border: 1px solid var(--border-light);
+        }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            z-index: 10;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+        .modal-header h2 { font-size: 1.4rem; margin: 0; }
+        .modal-close {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #f5f5f5;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            flex-shrink: 0;
+        }
+        .modal-close:hover { background: #e0e0e0; transform: rotate(90deg); }
+        .modal-body { padding: 24px; }
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .form-group { margin-bottom: 18px; display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-weight: 700; font-size: 0.85rem; color: var(--secondary); letter-spacing: 0.02em; }
+        .form-group label .required { color: #d94436; }
+        .form-group input, .form-group textarea, .form-group select {
+            padding: 11px 14px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-family: var(--font-body);
+            background: #fafaf8;
+            transition: all var(--transition-fast);
+            color: var(--text);
+            resize: vertical;
+        }
+        .form-group textarea { min-height: 120px; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(232, 117, 26, 0.1);
+            background: #fff;
+        }
+        .form-group .help-text { font-size: 0.75rem; color: var(--text-muted); }
+        .image-preview {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            margin-top: 8px;
+            display: none;
+            background: #fafaf8;
+        }
+        .image-preview.visible { display: block; }
+        .tag-input-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: #fafaf8;
+            min-height: 44px;
+            align-items: center;
+            cursor: text;
+            transition: all var(--transition-fast);
+        }
+        .tag-input-wrapper:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(232, 117, 26, 0.1);
+            background: #fff;
+        }
+        .tag-input-wrapper .tag-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            border-radius: 20px;
+            background: #fef3e8;
+            color: var(--primary-dark);
+            border: 1px solid #fde0c0;
+            white-space: nowrap;
+        }
+        .tag-chip .tag-remove {
+            cursor: pointer;
+            font-size: 0.9rem;
+            line-height: 1;
+            opacity: 0.6;
+            transition: opacity var(--transition-fast);
+            background: none;
+            border: none;
+            color: inherit;
+            padding: 0;
+            font-weight: bold;
+        }
+        .tag-chip .tag-remove:hover { opacity: 1; }
+        .tag-input-wrapper input {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            padding: 4px 6px !important;
+            flex: 1;
+            min-width: 100px;
+            font-size: 0.85rem;
+            background: transparent !important;
+            margin: 0 !important;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 5000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.88rem;
+            box-shadow: var(--shadow-lg);
+            animation: slideInRight 0.35s ease;
+            max-width: 380px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast.success { background: #2d8a4e; }
+        .toast.error { background: #d94436; }
+        .toast.info { background: #2c6fce; }
+
+        .detail-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+        }
+        .detail-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .detail-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+        .detail-desc { font-size: 1rem; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
+
+        @media (max-width: 900px) {
+            .news-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+            .filter-panel { flex-direction: column; gap: 10px; }
+            .filter-group { min-width: 100%; }
+            .header-logo { font-size: 1.2rem; }
+            .header-logo .logo-icon { font-size: 1.5rem; }
+            .btn { padding: 8px 14px; font-size: 0.8rem; }
+            h1 { font-size: 1.6rem; }
+            .main { padding: 16px 12px 40px; gap: 18px; }
+            .stats-bar { gap: 10px; }
+            .stat-card { padding: 12px 16px; min-width: 120px; }
+            .stat-icon { font-size: 1.6rem; width: 38px; height: 38px; }
+            .stat-info .stat-value { font-size: 1.2rem; }
+            .modal { max-width: 95vw; margin: 10px; border-radius: var(--radius-md); }
+            .modal-body { padding: 16px; }
+            .modal-header { padding: 14px 16px; }
+            .modal-footer { padding: 12px 16px; }
+            .news-card-image, .news-card-image-placeholder { height: 170px; }
+        }
+        @media (max-width: 480px) {
+            .news-grid { grid-template-columns: 1fr; gap: 12px; }
+            .header-inner { padding: 0 10px; gap: 8px; }
+            .header-logo { font-size: 1rem; }
+            .btn { padding: 7px 10px; font-size: 0.75rem; gap: 4px; }
+            .filter-panel { padding: 14px; }
+            .news-card-body { padding: 12px 14px; }
+            .news-card-actions { padding: 0 14px 12px; }
+            .toast-container { left: 12px; right: 12px; bottom: 12px; }
+            .toast { max-width: 100%; }
+        }
+
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 8px; }
+        .mt-4 { margin-top: 16px; }
+        .mb-2 { margin-bottom: 8px; }
+        .mb-4 { margin-bottom: 16px; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f5f0eb; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #c5bdb4; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a89e95; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <div class="header-logo" onclick="resetAndGoHome()" title="Basketball News Hub - Home">
+                <span class="logo-icon">🏀</span>
+                <span>Basketball News Hub</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-outline btn-sm" onclick="exportData()" title="Export all news as JSON file">📥 Export</button>
+                <button class="btn btn-outline btn-sm" onclick="triggerImport()" title="Import news from JSON file">📤 Import</button>
+                <button class="btn btn-primary" onclick="openAddModal()" title="Add a new basketball news article">➕ Add News</button>
+            </div>
+        </div>
+    </header>
+    <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="handleImportFile(event)">
+    <main class="main" id="mainContent">
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-card">
+                <div class="stat-icon orange">📰</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statTotal">0</div>
+                    <div class="stat-label">Total Articles</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon blue">🏷️</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statTags">0</div>
+                    <div class="stat-label">Unique Tags</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">📅</div>
+                <div class="stat-info">
+                    <div class="stat-value" id="statLatest">—</div>
+                    <div class="stat-label">Latest Article</div>
+                </div>
+            </div>
+        </div>
+        <div class="filter-panel" id="filterPanel">
+            <div class="filter-group">
+                <label for="searchKeywords">🔍 Search Keywords</label>
+                <input type="text" id="searchKeywords" placeholder="Search titles, descriptions..." oninput="applyFilters()">
+            </div>
+            <div class="filter-group">
+                <label for="filterTag">🏷️ Filter by Tag</label>
+                <select id="filterTag" onchange="applyFilters()">
+                    <option value="">All Tags</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterDateFrom">📅 Date From</label>
+                <input type="date" id="filterDateFrom" onchange="applyFilters()">
+            </div>
+            <div class="filter-group">
+                <label for="filterDateTo">📅 Date To</label>
+                <input type="date" id="filterDateTo" onchange="applyFilters()">
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-ghost btn-sm" onclick="clearFilters()" title="Reset all filters">🔄 Clear</button>
+                <button class="btn btn-primary btn-sm" onclick="applyFilters()">🔍 Search</button>
+            </div>
+        </div>
+        <div class="news-grid" id="newsGrid"></div>
+    </main>
+
+    <div class="modal-overlay" id="editModalOverlay" style="display:none;" onclick="closeModalIfOverlay(event)">
+        <div class="modal" id="editModal">
+            <div class="modal-header">
+                <h2 id="editModalTitle">➕ Add News Article</h2>
+                <button class="modal-close" onclick="closeEditModal()" title="Close">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="newsForm" onsubmit="handleFormSubmit(event)">
+                    <input type="hidden" id="editNewsId" value="">
+                    <div class="form-group">
+                        <label for="newsTitle">Title <span class="required">*</span></label>
+                        <input type="text" id="newsTitle" required placeholder="e.g., Lakers Stun Celtics in Overtime Thriller" maxlength="200">
+                    </div>
+                    <div class="form-group">
+                        <label for="newsDate">Date <span class="required">*</span></label>
+                        <input type="date" id="newsDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newsDescription">Description <span class="required">*</span></label>
+                        <textarea id="newsDescription" required placeholder="Write a compelling description of the news..." maxlength="5000"></textarea>
+                        <span class="help-text" id="descCharCount">0 / 5000 characters</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="newsImage">Image (optional)</label>
+                        <input type="file" id="newsImage" accept="image/*" onchange="handleImagePreview(event)">
+                        <span class="help-text">Max recommended size: ~500KB. Larger images may affect storage.</span>
+                        <img id="imagePreview" class="image-preview" alt="Preview">
+                        <button type="button" class="btn btn-ghost btn-sm mt-2" id="removeImageBtn" style="display:none;" onclick="removeImage()">🗑️ Remove Image</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Tags</label>
+                        <div class="tag-input-wrapper" id="tagInputWrapper" onclick="focusTagInput()">
+                            <input type="text" id="tagInputField" placeholder="Type tag and press Enter or comma..." onkeydown="handleTagInputKey(event)">
+                        </div>
+                        <span class="help-text">Suggested: NBA, NCAA, EuroLeague, Draft, Trade, Injury, Playoffs, Highlights, Analysis, Breaking, Offseason, All-Star</span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
+                <button class="btn btn-primary" type="submit" form="newsForm" id="saveNewsBtn">💾 Save Article</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="detailModalOverlay" style="display:none;" onclick="closeModalIfOverlay(event)">
+        <div class="modal" id="detailModal">
+            <div class="modal-header">
+                <h2 id="detailTitle">Article Title</h2>
+                <button class="modal-close" onclick="closeDetailModal()" title="Close">✕</button>
+            </div>
+            <div class="modal-body" id="detailBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeDetailModal()">Close</button>
+                <button class="btn btn-primary" id="detailEditBtn" onclick="editFromDetail()">✏️ Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="confirmModalOverlay" style="display:none;" onclick="closeModalIfOverlay(event)">
+        <div class="modal" style="max-width:440px;" id="confirmModal">
+            <div class="modal-header">
+                <h2>⚠️ Confirm Delete</h2>
+                <button class="modal-close" onclick="closeConfirmModal()" title="Close">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to permanently delete this article?</p>
+                <p style="color:var(--text-muted);font-size:0.85rem;">This action cannot be undone.</p>
+                <p class="mt-2" style="font-weight:700;" id="confirmArticleTitle"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeConfirmModal()">Cancel</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn" onclick="executeDelete()">🗑️ Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        (function() {
+            // ============================================================
+            // STORAGE UTILITIES – handles localStorage unavailability
+            // ============================================================
+            const STORAGE_KEY = 'basketball_news_hub_data';
+            let memoryStore = null; // fallback when localStorage is disabled
+
+            function isLocalStorageAvailable() {
+                try {
+                    const test = '__storage_test__';
+                    localStorage.setItem(test, test);
+                    localStorage.removeItem(test);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            const useLocalStorage = isLocalStorageAvailable();
+
+            function loadNews() {
+                if (useLocalStorage) {
+                    try {
+                        const raw = localStorage.getItem(STORAGE_KEY);
+                        if (raw) {
+                            const parsed = JSON.parse(raw);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                allNews = parsed;
+                                return;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Failed to load from localStorage, using defaults.', e);
+                    }
+                } else {
+                    // Use in-memory store if available
+                    if (memoryStore && memoryStore.length > 0) {
+                        allNews = memoryStore;
+                        return;
+                    }
+                }
+                // Fallback to default sample data
+                allNews = JSON.parse(JSON.stringify(defaultNews));
+                saveNews(); // will store in memory or localStorage
+            }
+
+            function saveNews() {
+                if (useLocalStorage) {
+                    try {
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(allNews));
+                    } catch (e) {
+                        if (e.name === 'QuotaExceededError') {
+                            showToast('Storage full! Try removing some articles or using smaller images.', 'error');
+                        } else {
+                            // Only show error if it's a real problem, not a security block
+                            console.error('Save error:', e);
+                        }
+                    }
+                } else {
+                    // Store in memory when localStorage is unavailable
+                    memoryStore = allNews;
+                }
+            }
+
+            // ============================================================
+            // CONSTANTS & DOM REFERENCES
+            // ============================================================
+            const MAX_IMAGE_SIZE_WARNING = 500 * 1024;
+            const MAX_DESC_LENGTH = 5000;
+            const MAX_TITLE_LENGTH = 200;
+
+            const newsGrid = document.getElementById('newsGrid');
+            const filterPanel = document.getElementById('filterPanel');
+            const searchKeywords = document.getElementById('searchKeywords');
+            const filterTag = document.getElementById('filterTag');
+            const filterDateFrom = document.getElementById('filterDateFrom');
+            const filterDateTo = document.getElementById('filterDateTo');
+            const statTotal = document.getElementById('statTotal');
+            const statTags = document.getElementById('statTags');
+            const statLatest = document.getElementById('statLatest');
+            const descCharCount = document.getElementById('descCharCount');
+            const imagePreview = document.getElementById('imagePreview');
+            const removeImageBtn = document.getElementById('removeImageBtn');
+            const tagInputWrapper = document.getElementById('tagInputWrapper');
+            const tagInputField = document.getElementById('tagInputField');
+            const editModalOverlay = document.getElementById('editModalOverlay');
+            const detailModalOverlay = document.getElementById('detailModalOverlay');
+            const confirmModalOverlay = document.getElementById('confirmModalOverlay');
+            const editNewsId = document.getElementById('editNewsId');
+            const newsTitle = document.getElementById('newsTitle');
+            const newsDate = document.getElementById('newsDate');
+            const newsDescription = document.getElementById('newsDescription');
+            const newsImage = document.getElementById('newsImage');
+            const editModalTitle = document.getElementById('editModalTitle');
+            const saveNewsBtn = document.getElementById('saveNewsBtn');
+            const detailTitle = document.getElementById('detailTitle');
+            const detailBody = document.getElementById('detailBody');
+            const detailEditBtn = document.getElementById('detailEditBtn');
+            const confirmArticleTitle = document.getElementById('confirmArticleTitle');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const toastContainer = document.getElementById('toastContainer');
+            const importFileInput = document.getElementById('importFileInput');
+
+            let allNews = [];
+            let currentTags = [];
+            let pendingDeleteId = null;
+            let currentDetailId = null;
+            let currentImageData = null;
+            let activeFilters = { keywords: '', tag: '', dateFrom: '', dateTo: '' };
+
+            const defaultNews = [{
+                id: generateId(),
+                title: 'Lakers Stage Incredible 22-Point Comeback to Beat Celtics in Double Overtime',
+                date: '2026-07-25',
+                description: 'In one of the most thrilling games of the season, the Los Angeles Lakers overcame a 22-point deficit to defeat the Boston Celtics 142-138 in double overtime. LeBron James led the charge with a triple-double, scoring 38 points, dishing out 14 assists, and grabbing 11 rebounds.',
+                tags: ['NBA', 'Lakers', 'Celtics', 'Highlights', 'Comeback'],
+                imageData: '',
+                createdAt: '2026-07-25T22:30:00Z'
+            }, {
+                id: generateId(),
+                title: '2026 NBA Draft: Top Prospects and Surprising Picks',
+                date: '2026-07-20',
+                description: 'The 2026 NBA Draft brought several surprises as teams made bold moves. International prospects dominated the first round with a record number of selections from Europe and Australia.',
+                tags: ['NBA', 'Draft', 'Analysis', 'Prospects'],
+                imageData: '',
+                createdAt: '2026-07-20T18:00:00Z'
+            }, {
+                id: generateId(),
+                title: 'EuroLeague Championship: Real Madrid Claims Historic 12th Title',
+                date: '2026-07-15',
+                description: 'Real Madrid secured their record-extending 12th EuroLeague championship with a dominant 89-74 victory over Olympiacos in the final.',
+                tags: ['EuroLeague', 'Real Madrid', 'Championship', 'International'],
+                imageData: '',
+                createdAt: '2026-07-15T20:00:00Z'
+            }];
+
+            function generateId() {
+                return 'news_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 9);
+            }
+
+            // ============================================================
+            // RENDERING
+            // ============================================================
+            function renderAll() {
+                renderNewsGrid(allNews);
+                updateStats();
+                updateFilterTagOptions();
+                updateActiveFilterDisplay();
+            }
+
+            function renderNewsGrid(newsArray) {
+                if (!newsArray || newsArray.length === 0) {
+                    newsGrid.innerHTML = `
+                    <div class="empty-state">
+                      <div class="empty-icon">🏀</div>
+                      <h3>No News Articles Found</h3>
+                      <p>No articles match your current filters. Try adjusting your search criteria or add a new article.</p>
+                      <button class="btn btn-primary" onclick="openAddModal()">➕ Add Your First Article</button>
+                    </div>`;
+                    return;
+                }
+                const sorted = [...newsArray].sort((a, b) => new Date(b.date) - new Date(a.date));
+                let html = '';
+                sorted.forEach(news => {
+                    const imageHtml = news.imageData ?
+                        `<img src="${escapeHtmlAttr(news.imageData)}" alt="${escapeHtmlAttr(news.title)}" class="news-card-image" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` :
+                        '';
+                    const placeholderHtml = !news.imageData ?
+                        `<div class="news-card-image-placeholder">🏀</div>` :
+                        `<div class="news-card-image-placeholder" style="display:none;">🏀</div>`;
+                    const tagsHtml = (news.tags && news.tags.length > 0) ?
+                        news.tags.map(t => `<span class="tag" onclick="event.stopPropagation();quickFilterByTag('${escapeHtmlAttr(t)}')" title="Filter by '${escapeHtmlAttr(t)}'">#${escapeHtml(t)}</span>`).join('') :
+                        '';
+                    const dateFormatted = formatDate(news.date);
+                    const descPreview = (news.description || '').length > 150 ?
+                        (news.description || '').substring(0, 150) + '...' :
+                        (news.description || '');
+                    html += `
+                    <div class="news-card" onclick="openDetailModal('${news.id}')" title="Click to view details">
+                      ${imageHtml}
+                      ${placeholderHtml}
+                      <div class="news-card-body">
+                        <span class="news-card-date">📅 ${dateFormatted}</span>
+                        <h3 class="news-card-title">${escapeHtml(news.title)}</h3>
+                        <p class="news-card-desc">${escapeHtml(descPreview)}</p>
+                        <div class="news-card-tags">${tagsHtml}</div>
+                      </div>
+                      <div class="news-card-actions">
+                        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditModal('${news.id}')" title="Edit this article">✏️ Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();openConfirmModal('${news.id}')" title="Delete this article">🗑️ Delete</button>
+                      </div>
+                    </div>`;
+                });
+                newsGrid.innerHTML = html;
+            }
+
+            function updateStats() {
+                statTotal.textContent = allNews.length;
+                const allTagsSet = new Set();
+                allNews.forEach(n => { if (n.tags) n.tags.forEach(t => allTagsSet.add(t.toLowerCase())); });
+                statTags.textContent = allTagsSet.size;
+                if (allNews.length > 0) {
+                    const sorted = [...allNews].sort((a, b) => new Date(b.date) - new Date(a.date));
+                    statLatest.textContent = formatDateShort(sorted[0].date);
+                } else {
+                    statLatest.textContent = '—';
+                }
+            }
+
+            function updateFilterTagOptions() {
+                const allTagsSet = new Set();
+                allNews.forEach(n => { if (n.tags) n.tags.forEach(t => allTagsSet.add(t)); });
+                const sortedTags = [...allTagsSet].sort((a, b) => a.localeCompare(b));
+                const currentVal = filterTag.value;
+                filterTag.innerHTML = '<option value="">All Tags</option>';
+                sortedTags.forEach(t => {
+                    const selected = (currentVal === t) ? ' selected' : '';
+                    filterTag.innerHTML += `<option value="${escapeHtmlAttr(t)}"${selected}>${escapeHtml(t)} (${countTagOccurrences(t)})</option>`;
+                });
+                if (currentVal && !sortedTags.includes(currentVal) && currentVal !== '') {
+                    filterTag.innerHTML += `<option value="${escapeHtmlAttr(currentVal)}" selected>${escapeHtml(currentVal)}</option>`;
+                }
+            }
+
+            function countTagOccurrences(tag) {
+                return allNews.filter(n => n.tags && n.tags.some(t => t.toLowerCase() === tag.toLowerCase())).length;
+            }
+
+            function updateActiveFilterDisplay() {
+                activeFilters.keywords = searchKeywords.value.trim();
+                activeFilters.tag = filterTag.value;
+                activeFilters.dateFrom = filterDateFrom.value;
+                activeFilters.dateTo = filterDateTo.value;
+            }
+
+            function applyFilters() {
+                updateActiveFilterDisplay();
+                let filtered = [...allNews];
+                const kw = activeFilters.keywords.toLowerCase();
+                if (kw) {
+                    filtered = filtered.filter(n => {
+                        return (n.title || '').toLowerCase().includes(kw) ||
+                               (n.description || '').toLowerCase().includes(kw) ||
+                               (n.tags || []).some(t => t.toLowerCase().includes(kw));
+                    });
+                }
+                if (activeFilters.tag) {
+                    const tagLower = activeFilters.tag.toLowerCase();
+                    filtered = filtered.filter(n => n.tags && n.tags.some(t => t.toLowerCase() === tagLower));
+                }
+                if (activeFilters.dateFrom) filtered = filtered.filter(n => n.date >= activeFilters.dateFrom);
+                if (activeFilters.dateTo) filtered = filtered.filter(n => n.date <= activeFilters.dateTo);
+                filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+                renderNewsGrid(filtered);
+                updateStats();
+                updateFilterTagOptions();
+                if (filtered.length < allNews.length && (kw || activeFilters.tag || activeFilters.dateFrom || activeFilters.dateTo)) {
+                    showToast(`Found ${filtered.length} article(s) matching your filters.`, 'info');
+                }
+            }
+
+            function clearFilters() {
+                searchKeywords.value = '';
+                filterTag.value = '';
+                filterDateFrom.value = '';
+                filterDateTo.value = '';
+                activeFilters = { keywords: '', tag: '', dateFrom: '', dateTo: '' };
+                renderNewsGrid(allNews);
+                updateStats();
+                updateFilterTagOptions();
+                showToast('Filters cleared. Showing all articles.', 'info');
+            }
+
+            function quickFilterByTag(tag) {
+                filterTag.value = tag;
+                searchKeywords.value = '';
+                filterDateFrom.value = '';
+                filterDateTo.value = '';
+                applyFilters();
+                filterPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            // ============================================================
+            // MODALS
+            // ============================================================
+            function openAddModal() {
+                resetEditForm();
+                editNewsId.value = '';
+                editModalTitle.textContent = '➕ Add News Article';
+                saveNewsBtn.textContent = '💾 Save Article';
+                currentTags = [];
+                currentImageData = null;
+                renderTagChips();
+                imagePreview.classList.remove('visible');
+                imagePreview.src = '';
+                removeImageBtn.style.display = 'none';
+                newsImage.value = '';
+                newsDate.value = new Date().toISOString().split('T')[0];
+                descCharCount.textContent = '0 / ' + MAX_DESC_LENGTH + ' characters';
+                editModalOverlay.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                setTimeout(() => newsTitle.focus(), 150);
+            }
+
+            function openEditModal(newsId) {
+                const news = allNews.find(n => n.id === newsId);
+                if (!news) { showToast('Article not found.', 'error'); return; }
+                resetEditForm();
+                editNewsId.value = news.id;
+                editModalTitle.textContent = '✏️ Edit News Article';
+                saveNewsBtn.textContent = '💾 Update Article';
+                newsTitle.value = news.title || '';
+                newsDate.value = news.date || '';
+                newsDescription.value = news.description || '';
+                currentTags = news.tags ? [...news.tags] : [];
+                currentImageData = news.imageData || null;
+                renderTagChips();
+                if (currentImageData) {
+                    imagePreview.src = currentImageData;
+                    imagePreview.classList.add('visible');
+                    removeImageBtn.style.display = 'inline-flex';
+                } else {
+                    imagePreview.classList.remove('visible');
+                    imagePreview.src = '';
+                    removeImageBtn.style.display = 'none';
+                }
+                newsImage.value = '';
+                updateDescCharCount();
+                editModalOverlay.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                setTimeout(() => newsTitle.focus(), 150);
+            }
+
+            function closeEditModal() {
+                editModalOverlay.style.display = 'none';
+                document.body.style.overflow = '';
+                resetEditForm();
+            }
+
+            function openDetailModal(newsId) {
+                const news = allNews.find(n => n.id === newsId);
+                if (!news) { showToast('Article not found.', 'error'); return; }
+                currentDetailId = newsId;
+                detailTitle.textContent = news.title;
+                const dateFormatted = formatDate(news.date);
+                const imageHtml = news.imageData ? `<img src="${escapeHtmlAttr(news.imageData)}" alt="${escapeHtmlAttr(news.title)}" class="detail-image" onerror="this.style.display='none';">` : '';
+                const tagsHtml = (news.tags && news.tags.length > 0) ? news.tags.map(t => `<span class="tag">#${escapeHtml(t)}</span>`).join(' ') : '<span style="color:var(--text-muted);">No tags</span>';
+                detailBody.innerHTML = `
+                  ${imageHtml}
+                  <div class="detail-meta">
+                    <span>📅 <strong>${dateFormatted}</strong></span>
+                    <span>🕐 Created: ${formatDateTime(news.createdAt || news.date)}</span>
+                  </div>
+                  <div class="detail-tags">${tagsHtml}</div>
+                  <hr style="border:none;border-top:1px solid var(--border-light);margin:16px 0;">
+                  <div class="detail-desc">${escapeHtml(news.description || 'No description provided.')}</div>
+                `;
+                detailEditBtn.onclick = () => { closeDetailModal(); setTimeout(() => openEditModal(newsId), 200); };
+                detailModalOverlay.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeDetailModal() {
+                detailModalOverlay.style.display = 'none';
+                document.body.style.overflow = '';
+                currentDetailId = null;
+            }
+
+            function editFromDetail() {
+                if (currentDetailId) { closeDetailModal(); setTimeout(() => openEditModal(currentDetailId), 200); }
+            }
+
+            function openConfirmModal(newsId) {
+                const news = allNews.find(n => n.id === newsId);
+                if (!news) return;
+                pendingDeleteId = newsId;
+                confirmArticleTitle.textContent = '📄 ' + (news.title || 'Untitled');
+                confirmModalOverlay.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeConfirmModal() {
+                confirmModalOverlay.style.display = 'none';
+                document.body.style.overflow = '';
+                pendingDeleteId = null;
+            }
+
+            function executeDelete() {
+                if (!pendingDeleteId) return;
+                const news = allNews.find(n => n.id === pendingDeleteId);
+                const title = news ? news.title : 'Unknown article';
+                allNews = allNews.filter(n => n.id !== pendingDeleteId);
+                saveNews();
+                closeConfirmModal();
+                applyFilters();
+                updateFilterTagOptions();
+                updateStats();
+                showToast(`Deleted: "${title.substring(0, 60)}${title.length > 60 ? '...' : ''}"`, 'success');
+            }
+
+            function closeModalIfOverlay(event) {
+                if (event.target === event.currentTarget) {
+                    if (event.currentTarget === editModalOverlay) closeEditModal();
+                    if (event.currentTarget === detailModalOverlay) closeDetailModal();
+                    if (event.currentTarget === confirmModalOverlay) closeConfirmModal();
+                }
+            }
+
+            // ============================================================
+            // FORM HANDLING
+            // ============================================================
+            function resetEditForm() {
+                newsTitle.value = '';
+                newsDate.value = '';
+                newsDescription.value = '';
+                newsImage.value = '';
+                currentTags = [];
+                currentImageData = null;
+                imagePreview.classList.remove('visible');
+                imagePreview.src = '';
+                removeImageBtn.style.display = 'none';
+                editNewsId.value = '';
+                descCharCount.textContent = '0 / ' + MAX_DESC_LENGTH + ' characters';
+                renderTagChips();
+            }
+
+            function handleFormSubmit(event) {
+                event.preventDefault();
+                const title = newsTitle.value.trim();
+                const date = newsDate.value;
+                const description = newsDescription.value.trim();
+                if (!title || !date || !description) {
+                    showToast('Please fill in all required fields (Title, Date, Description).', 'error');
+                    return;
+                }
+                if (title.length > MAX_TITLE_LENGTH) { showToast(`Title must be ${MAX_TITLE_LENGTH} characters or fewer.`, 'error'); return; }
+                if (description.length > MAX_DESC_LENGTH) { showToast(`Description must be ${MAX_DESC_LENGTH} characters or fewer.`, 'error'); return; }
+                const newsId = editNewsId.value;
+                const now = new Date().toISOString();
+                if (newsId) {
+                    const index = allNews.findIndex(n => n.id === newsId);
+                    if (index === -1) { showToast('Article not found for update.', 'error'); return; }
+                    allNews[index].title = title;
+                    allNews[index].date = date;
+                    allNews[index].description = description;
+                    allNews[index].tags = [...currentTags];
+                    allNews[index].imageData = currentImageData || '';
+                    allNews[index].updatedAt = now;
+                    showToast('Article updated successfully! 🏀', 'success');
+                } else {
+                    const newArticle = {
+                        id: generateId(),
+                        title: title,
+                        date: date,
+                        description: description,
+                        tags: [...currentTags],
+                        imageData: currentImageData || '',
+                        createdAt: now,
+                        updatedAt: now
+                    };
+                    allNews.push(newArticle);
+                    showToast('New article added! 🎉', 'success');
+                }
+                saveNews();
+                closeEditModal();
+                applyFilters();
+                updateFilterTagOptions();
+                updateStats();
+                newsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            function updateDescCharCount() {
+                const len = (newsDescription.value || '').length;
+                descCharCount.textContent = len + ' / ' + MAX_DESC_LENGTH + ' characters';
+                if (len > MAX_DESC_LENGTH * 0.9) descCharCount.style.color = '#d94436';
+                else descCharCount.style.color = '';
+            }
+
+            function handleImagePreview(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                if (!file.type.startsWith('image/')) { showToast('Please select a valid image file.', 'error'); newsImage.value = ''; return; }
+                if (file.size > MAX_IMAGE_SIZE_WARNING) showToast(`Image is ${(file.size / 1024).toFixed(1)}KB. Large images may exhaust browser storage. Consider resizing.`, 'info');
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImageData = e.target.result;
+                    imagePreview.src = currentImageData;
+                    imagePreview.classList.add('visible');
+                    removeImageBtn.style.display = 'inline-flex';
+                };
+                reader.onerror = function() { showToast('Failed to read image file.', 'error'); };
+                reader.readAsDataURL(file);
+            }
+
+            function removeImage() {
+                currentImageData = null;
+                imagePreview.classList.remove('visible');
+                imagePreview.src = '';
+                removeImageBtn.style.display = 'none';
+                newsImage.value = '';
+                showToast('Image removed.', 'info');
+            }
+
+            // ============================================================
+            // TAGS
+            // ============================================================
+            function renderTagChips() {
+                const existingChips = tagInputWrapper.querySelectorAll('.tag-chip');
+                existingChips.forEach(chip => chip.remove());
+                const input = tagInputField;
+                currentTags.forEach((tag, index) => {
+                    const chip = document.createElement('span');
+                    chip.className = 'tag-chip';
+                    chip.innerHTML = `#${escapeHtml(tag)} <button class="tag-remove" type="button" onclick="event.stopPropagation();removeTag(${index})" title="Remove tag">×</button>`;
+                    tagInputWrapper.insertBefore(chip, input);
+                });
+            }
+
+            function addTag(tagValue) {
+                const trimmed = tagValue.trim().replace(/^#/, '').trim();
+                if (!trimmed) return;
+                if (trimmed.length > 40) { showToast('Tag is too long (max 40 characters).', 'error'); return; }
+                if (currentTags.length >= 15) { showToast('Maximum 15 tags per article.', 'error'); return; }
+                if (currentTags.some(t => t.toLowerCase() === trimmed.toLowerCase())) { showToast('This tag already exists.', 'info'); return; }
+                currentTags.push(trimmed);
+                renderTagChips();
+                tagInputField.value = '';
+            }
+
+            function removeTag(index) {
+                if (index >= 0 && index < currentTags.length) {
+                    currentTags.splice(index, 1);
+                    renderTagChips();
+                }
+            }
+
+            function handleTagInputKey(event) {
+                if (event.key === 'Enter' || event.key === ',') {
+                    event.preventDefault();
+                    addTag(tagInputField.value);
+                } else if (event.key === 'Backspace' && tagInputField.value === '' && currentTags.length > 0) {
+                    removeTag(currentTags.length - 1);
+                }
+            }
+
+            function focusTagInput() { tagInputField.focus(); }
+
+            // ============================================================
+            // EXPORT / IMPORT
+            // ============================================================
+            function exportData() {
+                if (allNews.length === 0) { showToast('No articles to export.', 'info'); return; }
+                const dataStr = JSON.stringify(allNews, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `basketball-news-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast(`Exported ${allNews.length} article(s) successfully! 📥`, 'success');
+            }
+
+            function triggerImport() { importFileInput.click(); }
+
+            function handleImportFile(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                if (!file.name.endsWith('.json')) { showToast('Please select a valid JSON file.', 'error'); importFileInput.value = ''; return; }
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!Array.isArray(data)) throw new Error('Data is not an array.');
+                        const valid = data.filter(item => item && typeof item.title === 'string' && typeof item.date === 'string' && typeof item.description === 'string');
+                        if (valid.length === 0) throw new Error('No valid articles found in file.');
+                        valid.forEach(item => {
+                            if (!item.id || typeof item.id !== 'string') item.id = generateId();
+                            if (!item.tags || !Array.isArray(item.tags)) item.tags = [];
+                            if (!item.imageData) item.imageData = '';
+                            if (!item.createdAt) item.createdAt = item.date + 'T00:00:00Z';
+                        });
+                        const merge = confirm(`Found ${valid.length} article(s) in the file.\n\nClick OK to REPLACE all current articles with the imported ones.\nClick Cancel to MERGE (add imported articles to existing ones).`);
+                        if (merge) {
+                            allNews = valid;
+                        } else {
+                            const existingIds = new Set(allNews.map(n => n.id));
+                            const toAdd = valid.filter(item => !existingIds.has(item.id));
+                            allNews = [...allNews, ...toAdd];
+                        }
+                        saveNews();
+                        applyFilters();
+                        updateFilterTagOptions();
+                        updateStats();
+                        showToast(`Successfully imported ${valid.length} article(s)! 📤`, 'success');
+                    } catch (err) {
+                        showToast('Failed to parse import file: ' + err.message, 'error');
+                    }
+                };
+                reader.onerror = function() { showToast('Failed to read import file.', 'error'); };
+                reader.readAsText(file);
+                importFileInput.value = '';
+            }
+
+            // ============================================================
+            // TOASTS
+            // ============================================================
+            function showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+                toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span> ${message}`;
+                toastContainer.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(120%)';
+                    toast.style.transition = 'all 0.35s ease';
+                    setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 350);
+                }, 3500);
+            }
+
+            // ============================================================
+            // UTILITIES
+            // ============================================================
+            function escapeHtml(str) { if (!str) return ''; const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
+            function escapeHtmlAttr(str) { if (!str) return ''; return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+            function formatDate(dateStr) { if (!dateStr) return 'Unknown date'; try { const d = new Date(dateStr + 'T00:00:00'); return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); } catch (e) { return dateStr; } }
+            function formatDateShort(dateStr) { if (!dateStr) return '—'; try { const d = new Date(dateStr + 'T00:00:00'); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); } catch (e) { return dateStr; } }
+            function formatDateTime(dateStr) { if (!dateStr) return 'Unknown'; try { const d = new Date(dateStr); return d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return dateStr; } }
+
+            function resetAndGoHome() {
+                clearFilters();
+                renderNewsGrid(allNews);
+                updateStats();
+                updateFilterTagOptions();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // ============================================================
+            // KEYBOARD SHORTCUTS
+            // ============================================================
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (confirmModalOverlay.style.display === 'flex') closeConfirmModal();
+                    else if (detailModalOverlay.style.display === 'flex') closeDetailModal();
+                    else if (editModalOverlay.style.display === 'flex') closeEditModal();
+                }
+                if ((e.ctrlKey && e.key === 'k') || (e.key === '/' && document.activeElement === document.body)) {
+                    e.preventDefault();
+                    searchKeywords.focus();
+                    searchKeywords.select();
+                    filterPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                if (e.ctrlKey && e.key === 'n') {
+                    e.preventDefault();
+                    openAddModal();
+                }
+            });
+
+            newsDescription.addEventListener('input', updateDescCharCount);
+            newsTitle.addEventListener('input', function() {
+                if (newsTitle.value.length > MAX_TITLE_LENGTH) newsTitle.style.borderColor = '#d94436';
+                else newsTitle.style.borderColor = '';
+            });
+
+            document.getElementById('editModal').addEventListener('click', function(e) { e.stopPropagation(); });
+            document.getElementById('detailModal').addEventListener('click', function(e) { e.stopPropagation(); });
+            document.getElementById('confirmModal').addEventListener('click', function(e) { e.stopPropagation(); });
+
+            // ============================================================
+            // INIT
+            // ============================================================
+            function init() {
+                loadNews();
+                renderAll();
+                console.log('🏀 Basketball News Hub ready!');
+                console.log(`   ${allNews.length} articles loaded (storage: ${useLocalStorage ? 'localStorage' : 'in‑memory'})`);
+            }
+
+            window.openAddModal = openAddModal;
+            window.openEditModal = openEditModal;
+            window.closeEditModal = closeEditModal;
+            window.openDetailModal = openDetailModal;
+            window.closeDetailModal = closeDetailModal;
+            window.editFromDetail = editFromDetail;
+            window.openConfirmModal = openConfirmModal;
+            window.closeConfirmModal = closeConfirmModal;
+            window.executeDelete = executeDelete;
+            window.closeModalIfOverlay = closeModalIfOverlay;
+            window.applyFilters = applyFilters;
+            window.clearFilters = clearFilters;
+            window.quickFilterByTag = quickFilterByTag;
+            window.handleFormSubmit = handleFormSubmit;
+            window.handleImagePreview = handleImagePreview;
+            window.removeImage = removeImage;
+            window.handleTagInputKey = handleTagInputKey;
+            window.focusTagInput = focusTagInput;
+            window.removeTag = removeTag;
+            window.exportData = exportData;
+            window.triggerImport = triggerImport;
+            window.handleImportFile = handleImportFile;
+            window.resetAndGoHome = resetAndGoHome;
+            window.showToast = showToast;
+
+            init();
+        })();
+    </script>
+</body>
+</html>
