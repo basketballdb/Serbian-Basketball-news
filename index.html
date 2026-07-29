@@ -626,6 +626,24 @@
         .detail-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
         .detail-desc { font-size: 1rem; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
 
+        /* Storage warning banner */
+        #storageWarning {
+            display: none;
+            background: #d94436;
+            color: #fff;
+            text-align: center;
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            position: sticky;
+            top: var(--header-height);
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        #storageWarning.success {
+            background: #2d8a4e;
+        }
+
         @media (max-width: 900px) {
             .news-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
             .filter-panel { flex-direction: column; gap: 10px; }
@@ -670,6 +688,12 @@
     </style>
 </head>
 <body>
+    <!-- STORAGE WARNING BANNER -->
+    <div id="storageWarning">
+        ⚠️ Browser storage is not available! Your changes will be lost when you close the page.<br>
+        Please check your browser privacy settings or try a different browser.
+    </div>
+
     <header class="header">
         <div class="header-inner">
             <div class="header-logo" onclick="resetAndGoHome()" title="Basketball News Hub - Home">
@@ -817,10 +841,11 @@
     <script>
         (function() {
             // ============================================================
-            // STORAGE UTILITIES – handles localStorage unavailability
+            // STORAGE UTILITIES – enhanced with warning banner & logs
             // ============================================================
             const STORAGE_KEY = 'basketball_news_hub_data';
-            let memoryStore = null; // fallback when localStorage is disabled
+            let memoryStore = null;
+            const storageWarning = document.getElementById('storageWarning');
 
             function isLocalStorageAvailable() {
                 try {
@@ -835,6 +860,13 @@
 
             const useLocalStorage = isLocalStorageAvailable();
 
+            // Show warning if localStorage is completely blocked
+            if (!useLocalStorage) {
+                storageWarning.style.display = 'block';
+                storageWarning.innerHTML = '⚠️ Browser storage is not available! Your changes will be lost when you close the page.<br>Please check your browser privacy settings or try a different browser.';
+                console.warn('localStorage is not available. All data will be kept in memory only.');
+            }
+
             function loadNews() {
                 if (useLocalStorage) {
                     try {
@@ -843,39 +875,46 @@
                             const parsed = JSON.parse(raw);
                             if (Array.isArray(parsed) && parsed.length > 0) {
                                 allNews = parsed;
+                                console.log('✅ Loaded', allNews.length, 'articles from localStorage.');
+                                storageWarning.style.display = 'none'; // hide banner on successful load
                                 return;
                             }
                         }
                     } catch (e) {
-                        console.warn('Failed to load from localStorage, using defaults.', e);
-                    }
-                } else {
-                    // Use in-memory store if available
-                    if (memoryStore && memoryStore.length > 0) {
-                        allNews = memoryStore;
-                        return;
+                        console.error('❌ Failed to load from localStorage:', e);
+                        storageWarning.style.display = 'block';
+                        storageWarning.innerHTML = '⚠️ Failed to load saved data. Starting with default articles.';
                     }
                 }
-                // Fallback to default sample data
-                allNews = JSON.parse(JSON.stringify(defaultNews));
-                saveNews(); // will store in memory or localStorage
+                // Fallback to memory or default
+                if (memoryStore && memoryStore.length > 0) {
+                    allNews = memoryStore;
+                    console.log('📦 Using in-memory store (no persistence).');
+                } else {
+                    allNews = JSON.parse(JSON.stringify(defaultNews));
+                    console.log('🆕 Loaded default articles.');
+                }
+                saveNews(); // attempt to persist (will log accordingly)
             }
 
             function saveNews() {
                 if (useLocalStorage) {
                     try {
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(allNews));
+                        console.log('💾 Saved', allNews.length, 'articles to localStorage.');
+                        // Hide warning if previously shown due to error
+                        storageWarning.style.display = 'none';
                     } catch (e) {
+                        console.error('❌ Save failed:', e);
+                        storageWarning.style.display = 'block';
+                        storageWarning.innerHTML = '❌ Save error! Your changes cannot be stored permanently.<br>Possible cause: storage full (try using smaller images) or browser privacy settings.';
                         if (e.name === 'QuotaExceededError') {
-                            showToast('Storage full! Try removing some articles or using smaller images.', 'error');
-                        } else {
-                            // Only show error if it's a real problem, not a security block
-                            console.error('Save error:', e);
+                            showToast('Storage full! Remove some articles or resize images.', 'error');
                         }
                     }
                 } else {
-                    // Store in memory when localStorage is unavailable
                     memoryStore = allNews;
+                    console.log('📝 Saved to memory only.');
                 }
             }
 
@@ -929,7 +968,7 @@
                 id: generateId(),
                 title: 'Lakers Stage Incredible 22-Point Comeback to Beat Celtics in Double Overtime',
                 date: '2026-07-25',
-                description: 'In one of the most thrilling games of the season, the Los Angeles Lakers overcame a 22-point deficit to defeat the Boston Celtics 142-138 in double overtime. LeBron James led the charge with a triple-double, scoring 38 points, dishing out 14 assists, and grabbing 11 rebounds.',
+                description: 'In one of the most thrilling games of the season, the Los Angeles Lakers overcame a 22-point deficit to defeat the Boston Celtics 142-138 in double overtime.',
                 tags: ['NBA', 'Lakers', 'Celtics', 'Highlights', 'Comeback'],
                 imageData: '',
                 createdAt: '2026-07-25T22:30:00Z'
@@ -937,7 +976,7 @@
                 id: generateId(),
                 title: '2026 NBA Draft: Top Prospects and Surprising Picks',
                 date: '2026-07-20',
-                description: 'The 2026 NBA Draft brought several surprises as teams made bold moves. International prospects dominated the first round with a record number of selections from Europe and Australia.',
+                description: 'The 2026 NBA Draft brought several surprises as teams made bold moves. International prospects dominated the first round.',
                 tags: ['NBA', 'Draft', 'Analysis', 'Prospects'],
                 imageData: '',
                 createdAt: '2026-07-20T18:00:00Z'
