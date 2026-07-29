@@ -306,7 +306,25 @@
 
     <script>
         // --- 1. STATE MANAGEMENT ---
-        let articles = JSON.parse(localStorage.getItem('basketballNews')) || [];
+        let articles = [
+    {
+        id: 'news_1',
+        title: 'Lakers Secure Massive Overtime Win',
+        image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80',
+        description: 'LeBron James took over in the fourth quarter, dropping 15 points to force overtime. The team rallied behind his leadership to secure a vital playoff spot.',
+        tags: ['Lakers', 'NBA', 'LeBron'],
+        date: '2023-10-25'
+    },
+    {
+        id: 'news_2',
+        title: 'Draft Prospects to Watch This Year',
+        image: 'https://images.unsplash.com/photo-1519861531473-9200262188bf?q=80',
+        description: 'With the college season wrapping up, scouts are looking closely at the top 5 international prospects who could shake up the lottery.',
+        tags: ['Draft', 'Scouting'],
+        date: '2023-10-24'
+    }
+    // To add a new article, put a comma after the last curly brace } and add a new block!
+];
 
         // Set default date in form to today
         document.getElementById('newsDate').valueAsDate = new Date();
