@@ -104,7 +104,17 @@
             max-width: 1400px; margin: 2rem auto; padding: 0 2%;
             display: grid; grid-template-columns: 350px 1fr; gap: 2rem;
             align-items: start;
+            transition: var(--transition);
         }
+        
+        /* Sidebar Hidden State */
+        .app-container.sidebar-hidden {
+            grid-template-columns: 1fr;
+        }
+        .app-container.sidebar-hidden .glass-panel {
+            display: none;
+        }
+
         @media (max-width: 992px) {
             .app-container { grid-template-columns: 1fr; }
             .navbar { flex-direction: column; gap: 15px; padding: 1rem; }
@@ -153,7 +163,6 @@
             margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-color);
         }
         .news-grid {
-            /* Changed to Flexbox for List View */
             display: flex; 
             flex-direction: column; 
             gap: 1.5rem;
@@ -167,7 +176,7 @@
             border: 1px solid var(--border-color);
             transition: var(--transition);
             display: flex; 
-            flex-direction: row; /* Horizontal layout */
+            flex-direction: row;
             animation: fadeUp 0.5s ease forwards;
             opacity: 0;
             transform: translateY(20px);
@@ -176,7 +185,7 @@
         
         .card-image-wrapper { 
             position: relative; 
-            width: 300px; /* Fixed width for the image side */
+            width: 300px;
             flex-shrink: 0;
             overflow: hidden; 
             cursor: pointer; 
@@ -279,6 +288,8 @@
             🏀 <span>Court</span>Vision
         </a>
         <div class="nav-controls">
+            <!-- New Sidebar Toggle Button -->
+            <button class="theme-toggle" onclick="toggleSidebar()" title="Toggle Editor Panel">📝</button>
             <div class="search-wrapper">
                 <input type="text" id="searchInput" class="search-input" placeholder="Search news, teams, players..." oninput="filterNews()">
             </div>
@@ -287,7 +298,7 @@
         </div>
     </nav>
 
-    <div class="app-container">
+    <div class="app-container" id="mainContainer">
         
         <aside class="glass-panel">
             <h2>✍️ Post Article</h2>
@@ -364,7 +375,7 @@
         // Set default date in form to today
         document.getElementById('newsDate').valueAsDate = new Date();
 
-        // --- 2. THEME MANAGEMENT ---
+        // --- 2. THEME & LAYOUT MANAGEMENT ---
         function toggleTheme() {
             const body = document.body;
             const currentTheme = body.getAttribute('data-theme');
@@ -380,6 +391,11 @@
                           (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         document.body.setAttribute('data-theme', savedTheme);
         document.getElementById('themeToggle').innerHTML = savedTheme === 'dark' ? '☀️' : '🌙';
+
+        function toggleSidebar() {
+            const container = document.getElementById('mainContainer');
+            container.classList.toggle('sidebar-hidden');
+        }
 
         // --- 3. UI UTILITIES (TOASTS) ---
         function showToast(message, type = 'success') {
@@ -518,6 +534,12 @@
             const article = articles.find(a => a.id === id);
             if (!article) return;
 
+            // Make sure sidebar opens if it was closed
+            const container = document.getElementById('mainContainer');
+            if(container.classList.contains('sidebar-hidden')) {
+                container.classList.remove('sidebar-hidden');
+            }
+
             document.getElementById('newsTitle').value = article.title;
             document.getElementById('newsImage').value = article.image;
             document.getElementById('newsDesc').value = article.description;
@@ -581,7 +603,6 @@
             const content = document.getElementById('modalContent');
             
             const dateObj = new Date(article.date);
-            // Removed 'weekday: long' from the formatted date
             const formattedDate = new Date(dateObj.getTime() + Math.abs(dateObj.getTimezoneOffset()*60000)).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             
             const tagsHTML = article.tags.map(t => `<span class="tag primary-tag">${t}</span>`).join('');
